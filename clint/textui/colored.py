@@ -21,6 +21,7 @@ from ..packages import colorama
 __all__ = (
     'red', 'green', 'yellow', 'blue',
     'black', 'magenta', 'cyan', 'white',
+    'bright', 'dark',
     'clean', 'disable'
 )
 
@@ -40,10 +41,12 @@ else:
 
 class ColoredString(object):
     """Enhanced string for __len__ operations on Colored output."""
-    def __init__(self, color, s):
+    def __init__(self, color, s, setter = None, resetter = None):
         super(ColoredString, self).__init__()
         self.s = s
         self.color = color
+        self.setter = setter if setter else getattr(colorama.Fore, self.color)
+        self.resetter = resetter if resetter else colorama.Fore.RESET
 
     def __getattr__(self, att): 
              def func_help(*args, **kwargs):
@@ -59,8 +62,7 @@ class ColoredString(object):
     @property
     def color_str(self):
         if sys.stdout.isatty() and not DISABLE_COLOR:
-            return '%s%s%s' % (
-                getattr(colorama.Fore, self.color), self.s, colorama.Fore.RESET)
+            return '%s%s%s' % (self.setter, self.s, self.resetter)
         else:
             return self.s
 
@@ -132,6 +134,12 @@ def cyan(string):
 
 def white(string):
     return ColoredString('WHITE', string)
+
+def bright(string):
+    return ColoredString('BRIGHT', string, colorama.Style.BRIGHT, colorama.Style.RESET_ALL)
+
+def dark(string):
+    return ColoredString('DARK', string, colorama.Style.DARK, colorama.Style.RESET_ALL)
 
 def disable():
     """Disables colors."""
