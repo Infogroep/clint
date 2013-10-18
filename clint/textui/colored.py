@@ -98,7 +98,7 @@ class ColoredString(object):
         return (self.color_str * other)
 
     def _new(self, s):
-        return ColoredString(self.color, s)
+        return ColoredString(self.color, s, self.setter, self.resetter)
 
 
 def clean(s):
